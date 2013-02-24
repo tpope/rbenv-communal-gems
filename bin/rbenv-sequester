@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# Summary: Remove a Ruby version from the communal gem pool
+#
+# Usage: rbenv sequester <version> [<version> ...]
+#        rbenv sequester --all
+
+shopt -s nullglob
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo --all
+  exec rbenv-versions --bare
+fi
+
+sequester() {
+  local gemdir="$RBENV_ROOT/versions/$1/lib/ruby/gems"
+  if [ -L "$gemdir" ]; then
+    rm "$gemdir"
+    mkdir "$gemdir"
+    echo "Sequestered gems for $1"
+  elif [ -d "$gemdir" ]; then
+    echo "Gems for $1 are already sequestered"
+  else
+    echo "No gem directory for $1" >&2
+    return 1
+  fi
+}
+
+if [ $# = 0 -o --help = "$1" ]; then
+  rbenv-help sequester
+elif [ --all = "$1" ]; then
+  for version in $(rbenv-versions --bare); do
+    [ -L "$RBENV_ROOT/versions/$version" ] || \
+      sequester "$version"
+  done
+else
+  for version in "$@"; do
+    sequester "$version"
+  done
+fi

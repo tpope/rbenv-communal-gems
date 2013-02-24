@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+#
+# Summary: Add a Ruby version to the communal gem pool
+#
+# Usage: rbenv communize <version> [<version> ...]
+#        rbenv communize --all
+
+shopt -s nullglob
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  echo --all
+  exec rbenv-versions --bare
+fi
+
+communize() {
+  local gemdir="$RBENV_ROOT/versions/$1/lib/ruby/gems"
+  if [ -L "$gemdir" ]; then
+    echo "Gems for $1 are already communal"
+  elif [ -d "$gemdir" ]; then
+    rm -rf "$gemdir"
+    ln -s ../../../../gems "$gemdir"
+    echo "Communized gems for $1"
+  else
+    echo "No gem directory for $1" >&2
+    return 1
+  fi
+}
+
+if [ $# = 0 -o --help = "$1" ]; then
+  rbenv-help communize
+elif [ --all = "$1" ]; then
+  for version in $(rbenv-versions --bare); do
+    [ -L "$RBENV_ROOT/versions/$version" ] || \
+      communize "$version"
+  done
+else
+  for version in "$@"; do
+    communize "$version"
+  done
+fi
