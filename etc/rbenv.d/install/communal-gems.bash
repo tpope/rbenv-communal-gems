@@ -3,7 +3,7 @@ if declare -Ff after_install >/dev/null; then
   after_install communize_gems
 fi
 
-remove_gem_link() {
+sequester_gems() {
   local gemdir="$PREFIX/lib/ruby/gems"
   if [ -L "$gemdir" ]; then
     rm "$gemdir"
