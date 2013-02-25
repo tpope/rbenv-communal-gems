@@ -19,6 +19,7 @@ communize() {
     echo "Gems for $1 are already communal"
   elif [ -d "$gemdir" ]; then
     rm -rf "$gemdir"
+    mkdir -p "$RBENV_ROOT/gems"
     ln -s ../../../../gems "$gemdir"
     echo "Communized gems for $1"
   else
