@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# Summary: Show the communal gem home if communal gems are enabled
+#
+# Usage: rbenv communal-gem-home [<version>]
+
+# Provide rbenv completions
+if [ "$1" = "--complete" ]; then
+  exec rbenv-versions --bare
+fi
+
+rbenv_version="${1:-$(rbenv-version-name)}"
+if [ -L "$RBENV_ROOT/versions/$rbenv_version/lib/ruby/gems" ]; then
+  cachedir="${BASH_SOURCE%/*}/../version_cache"
+  cachefile="$cachedir/$rbenv_version"
+  if [ -f "$cachefile" ]; then
+    communal_version="$(cat $cachefile)"
+  else
+    mkdir -p "$cachedir"
+    communal_version="$("$RBENV_ROOT/versions/$rbenv_version/bin/ruby" -rrbconfig -e 'puts RbConfig::CONFIG["ruby_version"]')"
+    echo "$communal_version" > "$cachefile"
+  fi
+
+  echo "$RBENV_ROOT/gems/$communal_version"
+else
+  exit 1
+fi
