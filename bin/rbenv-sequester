@@ -14,7 +14,11 @@ if [ "$1" = "--complete" ]; then
 fi
 
 sequester() {
-  local gemdir="$RBENV_ROOT/versions/$1/lib/ruby/gems"
+  local root="$RBENV_ROOT/versions/$1"
+  local gemdir="$root/lib/ruby/gems"
+  if [ -f "$root/etc/gemrc" ] && grep '# added by rbenv communize' "$root/etc/gemrc" >/dev/null; then
+    rm "$root/etc/gemrc"
+  fi
   if [ -L "$gemdir" ]; then
     rm "$gemdir"
     mkdir "$gemdir"

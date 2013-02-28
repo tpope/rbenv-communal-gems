@@ -14,8 +14,9 @@ if [ "$1" = "--complete" ]; then
 fi
 
 communize() {
-  local gemdir="$RBENV_ROOT/versions/$1/lib/ruby/gems"
-  if [ -L "$gemdir" ]; then
+  local root="$RBENV_ROOT/versions/$1"
+  local gemdir="$root/lib/ruby/gems"
+  if [ -L "$gemdir" -a -f "$root/etc/gemrc" ]; then
     echo "Gems for $1 are already communal"
   elif [ -d "$gemdir" ]; then
     rm -rf "$gemdir"
@@ -25,6 +26,14 @@ communize() {
   else
     echo "No gem directory for $1" >&2
     return 1
+  fi
+  if [ ! -f "$root/etc/gemrc" ]; then
+    mkdir -p "$root/etc"
+    cat > "$root/etc/gemrc" <<GEMRC
+# added by rbenv communize
+install: "--env-shebang"
+gemhome: "$(rbenv-communal-gem-home "$1")"
+GEMRC
   fi
 }
 
