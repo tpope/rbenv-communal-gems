@@ -1,6 +1,6 @@
 shopt -s nullglob
 communal_bin=(${RBENV_ROOT}/gems/*/bin/*)
-shopt -s nullglob
+shopt -u nullglob
 
 cd "$SHIM_PATH"
 make_shims ${communal_bin[@]}
