@@ -4,4 +4,4 @@ shopt -u nullglob
 
 cd "$SHIM_PATH"
 make_shims ${communal_bin[@]}
-cd "$CUR_PATH"
+cd "$OLDPWD"
